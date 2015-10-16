@@ -15,8 +15,15 @@ namespace WinSrvMonitor.Monitor
         {
             MonitorActorSystem = ActorSystem.Create("WinSrvMonitor");
 
+            IActorRef performanceCounterActor = MonitorActorSystem.ActorOf<PerformanceCounterActor>("cpuCounter");
+
+            Console.ReadLine();
+
+            performanceCounterActor.Tell(PoisonPill.Instance);
+
+            MonitorActorSystem.Dispose();
             // blocks the main thread from exiting until the actor system is shut down
-            MonitorActorSystem.AwaitTermination();
+            //MonitorActorSystem.AwaitTermination();
         }
     }
 }

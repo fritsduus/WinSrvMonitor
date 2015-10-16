@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,9 @@ namespace WinSrvMonitor.Monitor
         {
             MonitorActorSystem = ActorSystem.Create("WinSrvMonitorMonitor");
 
-            ActorSelection metricCollector = 
-                MonitorActorSystem.ActorSelection("akka.tcp://WinSrvMonitorServer@localhost:8041/user/metricCollector");
+            string monitorServer = ConfigurationManager.AppSettings["MonitorServer"];
+            string metricCollectorPath = string.Format("akka.tcp://WinSrvMonitorServer@{0}:8041/user/metricCollector", monitorServer);
+            ActorSelection metricCollector = MonitorActorSystem.ActorSelection(metricCollectorPath);
 
             IActorRef performanceCounterActor = MonitorActorSystem.ActorOf(
                 Props.Create(() => new PerformanceCounterActor(metricCollector)),

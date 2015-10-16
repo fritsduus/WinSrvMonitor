@@ -23,12 +23,12 @@ namespace WinSrvMonitor.Monitor
 
         public class GatherMetrics { }
 
-        public PerformanceCounterActor()
+        public PerformanceCounterActor(ActorSelection metricCollector)
         {
             _serverName = "localhost";
             _metricName = "CPU";
             _collectIntervalMs = 1000;
-            _metricCollector = Context.ActorSelection("akka.tcp://WinSrvMonitorServer@localhost:8041/user/metricCollector");
+            _metricCollector = metricCollector;
 
             _performanceCounterGenerator = () => new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
             _cancelPublishing = new Cancelable(Context.System.Scheduler);

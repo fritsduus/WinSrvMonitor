@@ -15,7 +15,12 @@ namespace WinSrvMonitor.Monitor
         {
             MonitorActorSystem = ActorSystem.Create("WinSrvMonitorMonitor");
 
-            IActorRef performanceCounterActor = MonitorActorSystem.ActorOf<PerformanceCounterActor>("cpuCounter");
+            ActorSelection metricCollector = 
+                MonitorActorSystem.ActorSelection("akka.tcp://WinSrvMonitorServer@localhost:8041/user/metricCollector");
+
+            IActorRef performanceCounterActor = MonitorActorSystem.ActorOf(
+                Props.Create(() => new PerformanceCounterActor(metricCollector)),
+                "cpuCounter");
 
             Console.ReadLine();
 
@@ -24,6 +29,7 @@ namespace WinSrvMonitor.Monitor
             MonitorActorSystem.Dispose();
             // blocks the main thread from exiting until the actor system is shut down
             //MonitorActorSystem.AwaitTermination();
+            Console.ReadLine();
         }
     }
 }

@@ -24,6 +24,7 @@ namespace WinSrvMonitor.Server
             MonitorActorSystem.Dispose();
             // blocks the main thread from exiting until the actor system is shut down
             //MonitorActorSystem.AwaitTermination();
+            Console.ReadLine();
         }
     }
 }

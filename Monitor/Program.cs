@@ -13,7 +13,7 @@ namespace WinSrvMonitor.Monitor
 
         static void Main(string[] args)
         {
-            MonitorActorSystem = ActorSystem.Create("WinSrvMonitor");
+            MonitorActorSystem = ActorSystem.Create("WinSrvMonitorMonitor");
 
             IActorRef performanceCounterActor = MonitorActorSystem.ActorOf<PerformanceCounterActor>("cpuCounter");
 

@@ -79,6 +79,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MetricCollectorActor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -93,6 +94,12 @@
     <Content Include="CHANGES.txt" />
     <Content Include="licenses\license.txt" />
     <Content Include="licenses\protoc-license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Messages\WinSrvMonitor.Messages.csproj">
+      <Project>{370cf6c3-f849-4e23-b95c-9827b6dff13d}</Project>
+      <Name>WinSrvMonitor.Messages</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

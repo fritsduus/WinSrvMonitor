@@ -13,11 +13,13 @@ namespace WinSrvMonitor.Server
 
         static void Main(string[] args)
         {
-            MonitorActorSystem = ActorSystem.Create("WinSrvMonitor");
+            MonitorActorSystem = ActorSystem.Create("WinSrvMonitorServer");
 
-            IActorRef performanceCounterActor = MonitorActorSystem.ActorOf<PerformanceCounter>
+            IActorRef metricCollectorActor = MonitorActorSystem.ActorOf<MetricCollectorActor>("metricCollector");
 
             Console.ReadLine();
+
+            metricCollectorActor.Tell(PoisonPill.Instance);
 
             MonitorActorSystem.Dispose();
             // blocks the main thread from exiting until the actor system is shut down

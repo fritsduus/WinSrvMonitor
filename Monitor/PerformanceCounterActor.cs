@@ -19,6 +19,7 @@ namespace WinSrvMonitor.Monitor
         private readonly ICancelable _cancelPublishing;
         private readonly int _collectIntervalMs;
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
+        private readonly ActorSelection _metricCollector;
 
         public class GatherMetrics { }
 
@@ -27,6 +28,8 @@ namespace WinSrvMonitor.Monitor
             _serverName = "localhost";
             _metricName = "CPU";
             _collectIntervalMs = 1000;
+            _metricCollector = Context.ActorSelection("akka.tcp://WinSrvMonitorServer@localhost:8041/user/metricCollector");
+
             _performanceCounterGenerator = () => new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
             _cancelPublishing = new Cancelable(Context.System.Scheduler);
             Initialize();
@@ -65,6 +68,7 @@ namespace WinSrvMonitor.Monitor
         {
             Metric metric = new Metric(_serverName, _metricName, _counter.NextValue());
             _log.Debug("Gathered metric: {0}-{1}: {2}", metric.ServerName, metric.MetricName, metric.Value);
+            _metricCollector.Tell(metric);
         }
     }
 }

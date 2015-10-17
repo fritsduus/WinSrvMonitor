@@ -23,14 +23,15 @@ namespace WinSrvMonitor.Monitor
 
         public class GatherMetrics { }
 
-        public PerformanceCounterActor(ActorSelection metricCollector)
+        public PerformanceCounterActor(string metricName, ActorSelection metricCollector,
+            Func<PerformanceCounter> performanceCounterGenerator, int collectIntervalMs)
         {
-            _serverName = "localhost";
-            _metricName = "CPU";
-            _collectIntervalMs = 1000;
+            _serverName = System.Net.Dns.GetHostName(); // "localhost";
+            _metricName = metricName;
+            _collectIntervalMs = collectIntervalMs;
             _metricCollector = metricCollector;
 
-            _performanceCounterGenerator = () => new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
+            _performanceCounterGenerator = performanceCounterGenerator;
             _cancelPublishing = new Cancelable(Context.System.Scheduler);
             Initialize();
         }
@@ -43,6 +44,7 @@ namespace WinSrvMonitor.Monitor
         private void Initialize()
         {
             _counter = _performanceCounterGenerator();
+            
             Context.System.Scheduler.ScheduleTellRepeatedly(
                 TimeSpan.FromMilliseconds(_collectIntervalMs),
                 TimeSpan.FromMilliseconds(_collectIntervalMs), Self,

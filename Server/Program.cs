@@ -15,11 +15,16 @@ namespace WinSrvMonitor.Server
         {
             MonitorActorSystem = ActorSystem.Create("WinSrvMonitorServer");
 
-            IActorRef metricCollectorActor = MonitorActorSystem.ActorOf<MetricCollectorActor>("metricCollector");
+            IActorRef metricDistributerActor = MonitorActorSystem.ActorOf<MetricDistributerActor>("metricDistributer");
+
+            IActorRef metricCollectorActor = MonitorActorSystem.ActorOf(
+                Props.Create(() => new MetricCollectorActor(metricDistributerActor)),
+                "metricCollector");
 
             Console.ReadLine();
 
             metricCollectorActor.Tell(PoisonPill.Instance);
+            metricDistributerActor.Tell(PoisonPill.Instance);
 
             MonitorActorSystem.Dispose();
             // blocks the main thread from exiting until the actor system is shut down

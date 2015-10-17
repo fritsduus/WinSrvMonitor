@@ -26,19 +26,21 @@ namespace WinSrvMonitor.Monitor
         public PerformanceCounterActor(string metricName, ActorSelection metricCollector,
             Func<PerformanceCounter> performanceCounterGenerator, int collectIntervalMs)
         {
-            _serverName = System.Net.Dns.GetHostName(); // "localhost";
+            _serverName = System.Net.Dns.GetHostName();
             _metricName = metricName;
             _collectIntervalMs = collectIntervalMs;
             _metricCollector = metricCollector;
 
             _performanceCounterGenerator = performanceCounterGenerator;
             _cancelPublishing = new Cancelable(Context.System.Scheduler);
-            Initialize();
+
+            Receive<GatherMetrics>(gm => HandleGatherMetrics(gm));
         }
 
-        public override void AroundPreStart()
+        protected override void PreStart()
         {
-            base.AroundPreStart();
+            Initialize();
+            base.PreStart();
         }
 
         private void Initialize()
@@ -49,10 +51,9 @@ namespace WinSrvMonitor.Monitor
                 TimeSpan.FromMilliseconds(_collectIntervalMs),
                 TimeSpan.FromMilliseconds(_collectIntervalMs), Self,
                 new GatherMetrics(), Self, _cancelPublishing);
-            Receive<GatherMetrics>(gm => HandleGatherMetrics(gm));
         }
 
-        public override void AroundPostStop()
+        protected override void PostStop()
         {
             try
             {
@@ -62,7 +63,7 @@ namespace WinSrvMonitor.Monitor
             catch { }
             finally
             {
-                base.AroundPostStop();
+                base.PostStop();
             }
         }
 

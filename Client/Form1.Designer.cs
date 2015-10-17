@@ -31,11 +31,11 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.metricViewItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.btnClose = new System.Windows.Forms.Button();
             this.serverDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.metricDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.valueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.metricViewItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.btnClose = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.metricViewItemBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -61,6 +61,21 @@
             this.dataGridView1.Size = new System.Drawing.Size(373, 328);
             this.dataGridView1.TabIndex = 0;
             // 
+            // metricViewItemBindingSource
+            // 
+            this.metricViewItemBindingSource.DataSource = typeof(WinSrvMonitor.Client.MetricViewItem);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnClose.Location = new System.Drawing.Point(424, 371);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(89, 31);
+            this.btnClose.TabIndex = 1;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
             // serverDataGridViewTextBoxColumn
             // 
             this.serverDataGridViewTextBoxColumn.DataPropertyName = "Server";
@@ -74,6 +89,7 @@
             this.metricDataGridViewTextBoxColumn.HeaderText = "Metric";
             this.metricDataGridViewTextBoxColumn.Name = "metricDataGridViewTextBoxColumn";
             this.metricDataGridViewTextBoxColumn.ReadOnly = true;
+            this.metricDataGridViewTextBoxColumn.Width = 70;
             // 
             // valueDataGridViewTextBoxColumn
             // 
@@ -84,20 +100,6 @@
             this.valueDataGridViewTextBoxColumn.HeaderText = "Value";
             this.valueDataGridViewTextBoxColumn.Name = "valueDataGridViewTextBoxColumn";
             this.valueDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // metricViewItemBindingSource
-            // 
-            this.metricViewItemBindingSource.DataSource = typeof(WinSrvMonitor.Client.MetricViewItem);
-            // 
-            // btnClose
-            // 
-            this.btnClose.Location = new System.Drawing.Point(424, 379);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(75, 23);
-            this.btnClose.TabIndex = 1;
-            this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // Form1
             // 
@@ -119,11 +121,11 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.BindingSource metricViewItemBindingSource;
+        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.DataGridViewTextBoxColumn serverDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn metricDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn valueDataGridViewTextBoxColumn;
-        private System.Windows.Forms.BindingSource metricViewItemBindingSource;
-        private System.Windows.Forms.Button btnClose;
     }
 }
 

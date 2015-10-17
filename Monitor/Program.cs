@@ -6,56 +6,52 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Topshelf;
 
 namespace WinSrvMonitor.Monitor
 {
     class Program
     {
-        public static ActorSystem MonitorActorSystem;
-
         static void Main(string[] args)
         {
-            MonitorActorSystem = ActorSystem.Create("WinSrvMonitorMonitor");
-
-            List<IActorRef> performanceCounterActors = CreatePerformanceCounterActors();
-
-            Console.ReadLine();
-
-            foreach(IActorRef actor in performanceCounterActors)
-                actor.Tell(PoisonPill.Instance);
-
-            MonitorActorSystem.Dispose();
-            // blocks the main thread from exiting until the actor system is shut down
-            //MonitorActorSystem.AwaitTermination();
-            Console.ReadLine();
+            //RunAsCommandLine();
+            RunAsService();
         }
 
-        private static List<IActorRef> CreatePerformanceCounterActors()
+        private static void RunAsService()
         {
-            int collectorIntervalMs = int.Parse(ConfigurationManager.AppSettings["CollectorIntervalMs"]);
-            string monitorServer = ConfigurationManager.AppSettings["MonitorServer"];
-            string metricCollectorPath = string.Format("akka.tcp://WinSrvMonitorServer@{0}:8041/user/metricCollector", monitorServer);
-            ActorSelection metricCollector = MonitorActorSystem.ActorSelection(metricCollectorPath);
+            HostFactory.Run(x =>                                 
+            {
+                x.Service<MonitorHost>(s =>                        
+                {
+                    s.ConstructUsing(name => new MonitorHost());     
+                    s.WhenStarted(tc => tc.Start());              
+                    s.WhenStopped(tc => tc.Stop());               
+                });
+                x.RunAsLocalSystem();                            
 
-            List<IActorRef> performanceCounterActors = new List<IActorRef>();
+                x.SetDescription("Monitors CPU and memory usage on Windows Servers");        
+                x.SetDisplayName("Windows Server Monitor");                       
+                x.SetServiceName("WinSrvMonitor");
 
-            performanceCounterActors.Add(CreatePerformanceCounterActor("CPU", metricCollector,
-                () => new PerformanceCounter("Processor", "% Processor Time", "_Total", true),
-                collectorIntervalMs));
-            performanceCounterActors.Add(CreatePerformanceCounterActor("Memory", metricCollector,
-                () => new PerformanceCounter("Memory", "% Committed Bytes in Use", true),
-                collectorIntervalMs));
+                x.StartAutomatically();
 
-            return performanceCounterActors;
+                x.EnableServiceRecovery(r =>
+                {
+                    r.RestartService(0);
+                });               
+            });                                                  
         }
 
-        private static IActorRef CreatePerformanceCounterActor(string metricName, ActorSelection metricCollector,
-            Func<PerformanceCounter> performanceCounterGenerator, int collectorIntervalMs)
+        private static void RunAsCommandLine()
         {
-            return MonitorActorSystem.ActorOf(
-                Props.Create(() => new PerformanceCounterActor(metricName, metricCollector,
-                    performanceCounterGenerator, collectorIntervalMs)),
-                metricName.ToLowerInvariant() + "Counter");
+            MonitorHost host = new MonitorHost();
+            host.Start();
+
+            Console.ReadLine();
+            host.Stop();
+
+            Console.ReadLine();
         }
     }
 }

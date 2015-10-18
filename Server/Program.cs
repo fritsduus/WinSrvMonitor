@@ -1,34 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Akka.Actor;
+using Topshelf;
 
 namespace WinSrvMonitor.Server
 {
     class Program
     {
-        public static ActorSystem MonitorActorSystem;
-
         static void Main(string[] args)
         {
-            MonitorActorSystem = ActorSystem.Create("WinSrvMonitorServer");
+            if (args.Length == 1 && args[0] == "commandline")
+                RunAsCommandLine();
+            else
+                RunAsService();
+        }
 
-            IActorRef metricDistributerActor = MonitorActorSystem.ActorOf<MetricDistributerActor>("metricDistributer");
+        private static void RunAsService()
+        {
+            HostFactory.Run(x =>
+            {
+                x.Service<ServerHost>(s =>
+                {
+                    s.ConstructUsing(name => new ServerHost());
+                    s.WhenStarted(tc => tc.Start());
+                    s.WhenStopped(tc => tc.Stop());
+                });
+                x.RunAsLocalSystem();
 
-            IActorRef metricCollectorActor = MonitorActorSystem.ActorOf(
-                Props.Create(() => new MetricCollectorActor(metricDistributerActor)),
-                "metricCollector");
+                x.SetDescription("Collects data from WinSrvMonitor.Monitor's and distributes the data to WinSrvMonitor.Client's");
+                x.SetDisplayName("Windows Server Monitor Server");
+                x.SetServiceName("WinSrvMonitorServer");
+
+                x.StartAutomatically();
+
+                x.EnableServiceRecovery(r =>
+                {
+                    r.RestartService(0);
+                });
+            });
+        }
+
+        private static void RunAsCommandLine()
+        {
+            ServerHost serverHost = new ServerHost();
+            serverHost.Start();
 
             Console.ReadLine();
+            serverHost.Stop();
 
-            metricCollectorActor.Tell(PoisonPill.Instance);
-            metricDistributerActor.Tell(PoisonPill.Instance);
-
-            MonitorActorSystem.Dispose();
-            // blocks the main thread from exiting until the actor system is shut down
-            //MonitorActorSystem.AwaitTermination();
             Console.ReadLine();
         }
     }

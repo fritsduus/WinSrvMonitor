@@ -61,10 +61,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(373, 328);
             this.dataGridView1.TabIndex = 0;
             // 
-            // metricViewItemBindingSource
-            // 
-            this.metricViewItemBindingSource.DataSource = typeof(WinSrvMonitor.Client.MetricViewItem);
-            // 
             // btnClose
             // 
             this.btnClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom;

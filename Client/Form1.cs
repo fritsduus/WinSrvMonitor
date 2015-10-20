@@ -19,6 +19,8 @@ namespace WinSrvMonitor.Client
             _metricTable.Columns.Add("Server", typeof(string));
             _metricTable.Columns.Add("Metric", typeof(string));
             _metricTable.Columns.Add("Value", typeof(float));
+            _metricTable.Columns.Add("MovingAverage", typeof(float));
+            _metricTable.Columns.Add("MovingAverageCalc", typeof(MovingAverage));
             //_metricTable.Rows.Add(new object[] { "Test", "Test", 10 });
         }
 

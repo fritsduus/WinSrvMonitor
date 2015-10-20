@@ -29,13 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.metricViewItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.btnClose = new System.Windows.Forms.Button();
-            this.serverDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.metricDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.valueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.metricViewItemBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -47,18 +43,12 @@
             this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.serverDataGridViewTextBoxColumn,
-            this.metricDataGridViewTextBoxColumn,
-            this.valueDataGridViewTextBoxColumn});
-            this.dataGridView1.DataSource = this.metricViewItemBindingSource;
             this.dataGridView1.Location = new System.Drawing.Point(12, 12);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(373, 328);
+            this.dataGridView1.Size = new System.Drawing.Size(564, 328);
             this.dataGridView1.TabIndex = 0;
             // 
             // btnClose
@@ -71,31 +61,6 @@
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
-            // serverDataGridViewTextBoxColumn
-            // 
-            this.serverDataGridViewTextBoxColumn.DataPropertyName = "Server";
-            this.serverDataGridViewTextBoxColumn.HeaderText = "Server";
-            this.serverDataGridViewTextBoxColumn.Name = "serverDataGridViewTextBoxColumn";
-            this.serverDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // metricDataGridViewTextBoxColumn
-            // 
-            this.metricDataGridViewTextBoxColumn.DataPropertyName = "Metric";
-            this.metricDataGridViewTextBoxColumn.HeaderText = "Metric";
-            this.metricDataGridViewTextBoxColumn.Name = "metricDataGridViewTextBoxColumn";
-            this.metricDataGridViewTextBoxColumn.ReadOnly = true;
-            this.metricDataGridViewTextBoxColumn.Width = 70;
-            // 
-            // valueDataGridViewTextBoxColumn
-            // 
-            this.valueDataGridViewTextBoxColumn.DataPropertyName = "Value";
-            dataGridViewCellStyle1.Format = "N2";
-            dataGridViewCellStyle1.NullValue = null;
-            this.valueDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
-            this.valueDataGridViewTextBoxColumn.HeaderText = "Value";
-            this.valueDataGridViewTextBoxColumn.Name = "valueDataGridViewTextBoxColumn";
-            this.valueDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // Form1
             // 

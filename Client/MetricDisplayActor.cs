@@ -36,10 +36,17 @@ namespace WinSrvMonitor.Client
             if (rows.Any())
             {
                 rows[0].SetField<float>(2, m.Value);
+                float newAvg = rows[0].Field<MovingAverage>(4).NextValue(m.Value);
+                rows[0].SetField<float>(3, newAvg);
             }
             else
             {
-                _metricTable.Rows.Add(new object[] { m.ServerName, m.MetricName, m.Value });
+                MovingAverage movingAverage = new MovingAverage(5);
+                _metricTable.Rows.Add(new object[] { m.ServerName, m.MetricName, m.Value,
+                    movingAverage.NextValue(m.Value), movingAverage});
+                _dataGridView.Columns[2].Width = 70;
+                _dataGridView.Columns[3].Width = 70;
+                _dataGridView.Columns[4].Visible = false;
             }
             _dataGridView.Update();
         }

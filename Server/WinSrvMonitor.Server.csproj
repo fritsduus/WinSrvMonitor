@@ -79,8 +79,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MetricCollectorActor.cs" />
-    <Compile Include="MetricDistributerActor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerHost.cs" />
@@ -98,9 +96,9 @@
     <Content Include="licenses\protoc-license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Messages\WinSrvMonitor.Messages.csproj">
-      <Project>{370cf6c3-f849-4e23-b95c-9827b6dff13d}</Project>
-      <Name>WinSrvMonitor.Messages</Name>
+    <ProjectReference Include="..\WinSrvMonitor.Collector\WinSrvMonitor.Collector.csproj">
+      <Project>{9795de48-ec71-4884-ae68-c03d71b4a2ca}</Project>
+      <Name>WinSrvMonitor.Collector</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

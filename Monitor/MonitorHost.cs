@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Akka.Actor;
+using WinSrvMonitor.Collector;
 
 namespace WinSrvMonitor.Monitor
 {
@@ -36,7 +37,6 @@ namespace WinSrvMonitor.Monitor
             string monitorServer = ConfigurationManager.AppSettings["MonitorServer"];
             string metricCollectorPath = string.Format("akka.tcp://WinSrvMonitorServer@{0}:8041/user/metricCollector", monitorServer);
             ActorSelection metricCollector = _monitorActorSystem.ActorSelection(metricCollectorPath);
-
             List<IActorRef> performanceCounterActors = new List<IActorRef>();
 
             performanceCounterActors.Add(CreatePerformanceCounterActor("CPU", metricCollector,
@@ -53,7 +53,7 @@ namespace WinSrvMonitor.Monitor
             Func<PerformanceCounter> performanceCounterGenerator, int collectorIntervalMs)
         {
             return _monitorActorSystem.ActorOf(
-                Props.Create(() => new PerformanceCounterActor(metricName, metricCollector,
+                Props.Create(() => new PerformanceCounterActor(null, null, metricName, metricCollector.Anchor,
                     performanceCounterGenerator, collectorIntervalMs)),
                 metricName.ToLowerInvariant() + "Counter");
         }

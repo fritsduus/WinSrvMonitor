@@ -7,8 +7,10 @@ namespace WinSrvMonitor.Monitor
     {
         static void Main(string[] args)
         {
-            //RunAsCommandLine();
-            RunAsService();
+            if (args.Length == 1 && args[0] == "commandline")
+                RunAsCommandLine();
+            else
+                RunAsService();
         }
 
         private static void RunAsService()

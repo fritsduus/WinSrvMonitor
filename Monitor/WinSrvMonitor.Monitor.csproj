@@ -81,12 +81,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MonitorHost.cs" />
-    <Compile Include="PerformanceCounterActor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="protos\google\protobuf\csharp_options.proto" />
     <None Include="protos\google\protobuf\descriptor.proto" />
@@ -101,6 +102,10 @@
     <ProjectReference Include="..\Messages\WinSrvMonitor.Messages.csproj">
       <Project>{370cf6c3-f849-4e23-b95c-9827b6dff13d}</Project>
       <Name>WinSrvMonitor.Messages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WinSrvMonitor.Collector\WinSrvMonitor.Collector.csproj">
+      <Project>{9795de48-ec71-4884-ae68-c03d71b4a2ca}</Project>
+      <Name>WinSrvMonitor.Collector</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
 ﻿using Akka.Actor;
+using WinSrvMonitor.Collector;
 
 namespace WinSrvMonitor.Server
 {

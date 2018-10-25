@@ -1,8 +1,9 @@
-﻿using Akka.Actor;
+﻿using System.Runtime.Remoting.Contexts;
+using Akka.Actor;
 using Akka.Event;
 using WinSrvMonitor.Messages;
 
-namespace WinSrvMonitor.Server
+namespace WinSrvMonitor.Collector
 {
     public class MetricCollectorActor : ReceiveActor
     {

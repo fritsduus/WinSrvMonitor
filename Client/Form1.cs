@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using Akka.Actor;
+using WinSrvMonitor.Client.ViewModels;
+using WinSrvMonitor.Collector;
 
 namespace WinSrvMonitor.Client
 {
     public partial class Form1 : Form
     {
         private IActorRef _displayActor;
-        //private readonly Dictionary<string, MetricViewItem> _metricViewItems;
-        private readonly DataTable _metricTable;
+        private readonly BindingSource _serverMetricsBindingSource = new BindingSource();
+
+        private readonly IList<ServerMetrics> _serverMetrics;
 
         public Form1()
         {
             InitializeComponent();
-            _metricTable = new DataTable("Metrics");
-            _metricTable.Columns.Add("Server", typeof(string));
-            _metricTable.Columns.Add("Metric", typeof(string));
-            _metricTable.Columns.Add("Value", typeof(float));
-            _metricTable.Columns.Add("MovingAverage", typeof(float));
-            _metricTable.Columns.Add("MovingAverageCalc", typeof(MovingAverage));
-            //_metricTable.Rows.Add(new object[] { "Test", "Test", 10 });
+            BindingList<ServerMetrics> list = new BindingList<ServerMetrics>();
+            _serverMetrics = list; //new List<ServerMetrics>();
+
+            _serverMetricsBindingSource.DataSource = list;
+            gridControl1.DataSource = _serverMetricsBindingSource;
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -31,14 +35,37 @@ namespace WinSrvMonitor.Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = _metricTable;
             _displayActor = Program.MonitorActorSystem.ActorOf(
-                Props.Create(() => new MetricDisplayActor(_metricTable, dataGridView1)), "displayMetrics");
+                Props.Create(() => new MetricDisplayActor(_serverMetrics, gridControl1)), "displayMetrics");
+
+            MetricCollectorFactory collectorFactory = new MetricCollectorFactory(Program.MonitorActorSystem);
+            int collectorIntervalMs = int.Parse(ConfigurationManager.AppSettings["CollectorIntervalMs"]);
+
+            collectorFactory.CreatePerformanceCounterActors("Other", "iWeb02", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "web6", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA04", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA05", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA06", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "Redis.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Other", "RavenDbNode04.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web8.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web9.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web10.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web11.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web12.shgdmz.dk", collectorIntervalMs, _displayActor);
+            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web13.shgdmz.dk", collectorIntervalMs, _displayActor);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _displayActor.Tell(PoisonPill.Instance);
+        }
+
+        private void gridView1_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            ServerMetrics serverMetrics = (ServerMetrics) gridView1.GetRow(e.RowHandle);
+            if (serverMetrics.HasError)
+                e.Appearance.BackColor = Color.DarkSalmon;
         }
     }
 }

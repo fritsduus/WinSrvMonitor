@@ -1,59 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Linq;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
-using System.Windows.Forms;
 using Akka.Actor;
+using DevExpress.XtraGrid;
+using WinSrvMonitor.Client.ViewModels;
 using WinSrvMonitor.Messages;
+using Metric = WinSrvMonitor.Messages.Metric;
 
 namespace WinSrvMonitor.Client
 {
     public class MetricDisplayActor : ReceiveActor
     {
-        private readonly DataGridView _dataGridView;
-        private readonly DataTable _metricTable;
+        private readonly IList<ServerMetrics> _serverMetrics;
+        private readonly GridControl _gridControl;
         private readonly ActorSelection _metricCollector;
 
-        public MetricDisplayActor(DataTable metricTable, DataGridView dataGridView)
+        public MetricDisplayActor(IList<ServerMetrics> serverMetrics, GridControl gridControl)
         {
-            _dataGridView = dataGridView;
-            _metricTable = metricTable;
+            _serverMetrics = serverMetrics;
+            _gridControl = gridControl;
             Receive<Metric>(m => HandleMetric(m));
 
             string monitorServer = ConfigurationManager.AppSettings["MonitorServer"];
-            string metricCollectorPath = string.Format("akka.tcp://WinSrvMonitorServer@{0}:8041/user/metricDistributer", monitorServer);
-            _metricCollector = Program.MonitorActorSystem.ActorSelection(metricCollectorPath);
-            _metricCollector.Tell(new SubscribeToMetrics(Self));
+            if (string.IsNullOrEmpty(monitorServer) || monitorServer == "localhost")
+            {
+                
+            }
+            else
+            {
+                string metricCollectorPath =
+                    $"akka.tcp://WinSrvMonitorServer@{monitorServer}:8041/user/metricDistributer";
+                _metricCollector = Program.MonitorActorSystem.ActorSelection(metricCollectorPath);
+                _metricCollector.Tell(new SubscribeToMetrics(Self));
+            }
         }
 
         private void HandleMetric(Metric m)
         {
-            DataRow[] rows = _metricTable.Select($"Server = '{m.ServerName}' AND Metric = '{m.MetricName}'");
-            if (rows.Any())
+            ServerMetrics serverMetrics = _serverMetrics.FirstOrDefault(sm => sm.Name == m.ServerName);
+            if (serverMetrics == null)
             {
-                rows[0].SetField<float>(2, m.Value);
-                float newAvg = rows[0].Field<MovingAverage>(4).NextValue(m.Value);
-                rows[0].SetField<float>(3, newAvg);
+                serverMetrics = new ServerMetrics(m.GroupName, m.ServerName);
+                _serverMetrics.Add(serverMetrics);
+
+                //_gridControl.Views[0].RefreshData();
             }
-            else
-            {
-                MovingAverage movingAverage = new MovingAverage(5);
-                _metricTable.Rows.Add(new object[] { m.ServerName, m.MetricName, m.Value,
-                    movingAverage.NextValue(m.Value), movingAverage});
-                _dataGridView.Columns[2].Width = 70;
-                _dataGridView.Columns[3].Width = 70;
-                _dataGridView.Columns[4].Visible = false;
-            }
-            _dataGridView.Update();
+            serverMetrics.UpdateMetric(m);
         }
 
         protected override void PostStop()
         {
-            _metricCollector.Tell(new UnsubscribeToMetrics(Self));
+            _metricCollector?.Tell(new UnsubscribeToMetrics(Self));
             base.PostStop();
         }
     }

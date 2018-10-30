@@ -33,7 +33,7 @@ namespace WinSrvMonitor.Collector
                 { MachineName = server },
                 collectorIntervalMs);
 
-            CreateNetworkCounter(group, server, collectorIntervalMs, metricCollector, 
+            CreateNetworkCounter(group, server, collectorIntervalMs, metricCollector,
                 performanceCounterActors, counterName: "Packets/sec", metricName: "PackagesPerSec");
 
             CreateNetworkCounter(group, server, collectorIntervalMs, metricCollector,
@@ -41,7 +41,7 @@ namespace WinSrvMonitor.Collector
 
             CreatePerformanceCounterActor(performanceCounterActors, group, server, "ActiveConnections", metricCollector,
                 () => new PerformanceCounter("TCPv4", "Connections Active", "", true)
-                    { MachineName = server },
+                { MachineName = server },
                 collectorIntervalMs);
 
             return performanceCounterActors;
@@ -50,34 +50,63 @@ namespace WinSrvMonitor.Collector
         private void CreateNetworkCounter(string group, string server, int collectorIntervalMs, IActorRef metricCollector,
             List<IActorRef> performanceCounterActors, string counterName, string metricName)
         {
-            Func<PerformanceCounter> packagesPerSec = null;
-            float currentMax = 0;
+            Func<PerformanceCounter> counterFunc = null;
             PerformanceCounterCategory category = new PerformanceCounterCategory("Network Interface", server);
             try
             {
                 string[] instancenames = category.GetInstanceNames();
-                foreach (string name in instancenames)
-                {
-                    Func<PerformanceCounter> counterFunc = () => new PerformanceCounter("Network Interface",
-                            counterName, name, true)
-                        {MachineName = server};
+                counterFunc = FindCounterWithValues(instancenames, counterName, server);
 
-                    var counter = counterFunc();
-                    float value = counter.NextValue() + counter.NextValue();
-                    if (value > currentMax)
+                if (counterFunc == null)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    counterFunc = FindCounterWithValues(instancenames, counterName, server);
+                    if (counterFunc == null)
                     {
-                        packagesPerSec = counterFunc;
-                        currentMax = value;
+                        System.Threading.Thread.Sleep(1000);
+                        counterFunc = FindCounterWithValues(instancenames, counterName, server);
                     }
                 }
             }
-            catch { }
+            catch
+            {
+                int i = 0;
+                i++;
+            }
 
-            if (packagesPerSec != null)
+            if (counterFunc != null)
             {
                 CreatePerformanceCounterActor(performanceCounterActors, group, server,
-                    metricName, metricCollector, packagesPerSec, collectorIntervalMs);
+                    metricName, metricCollector, counterFunc, collectorIntervalMs);
             }
+            else
+            {
+                int i = 0;
+                i++;
+            }
+        }
+
+        private Func<PerformanceCounter> FindCounterWithValues(string[] instancenames, string counterName, string server)
+        {
+            Func<PerformanceCounter> selectedCounterFunc = null;
+            float currentMax = 0;
+
+            foreach (string name in instancenames)
+            {
+                Func<PerformanceCounter> counterFunc = () => new PerformanceCounter("Network Interface",
+                        counterName, name, true)
+                { MachineName = server };
+
+                var counter = counterFunc();
+                float value = counter.NextValue();
+                value += counter.NextValue();
+                if (value > currentMax)
+                {
+                    selectedCounterFunc = counterFunc;
+                    currentMax = value;
+                }
+            }
+            return selectedCounterFunc;
         }
 
         private bool DoesPerformanceCounterExist(Func<PerformanceCounter> counterFunc)

@@ -41,19 +41,35 @@ namespace WinSrvMonitor.Client
             MetricCollectorFactory collectorFactory = new MetricCollectorFactory(Program.MonitorActorSystem);
             int collectorIntervalMs = int.Parse(ConfigurationManager.AppSettings["CollectorIntervalMs"]);
 
-            collectorFactory.CreatePerformanceCounterActors("Other", "iWeb02", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "web6", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA04", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA05", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA06", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "Redis.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Other", "RavenDbNode04.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web8.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web9.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web10.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web11.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web12.shgdmz.dk", collectorIntervalMs, _displayActor);
-            collectorFactory.CreatePerformanceCounterActors("Webfarm", "web13.shgdmz.dk", collectorIntervalMs, _displayActor);
+            string[] servers =
+                ConfigurationManager.AppSettings["OtherServers"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for(int i = 0; i < servers.Length; i++)
+            {
+                collectorFactory.CreatePerformanceCounterActors("Other", servers[i].Trim(), collectorIntervalMs, _displayActor);
+            }
+
+            servers =
+                ConfigurationManager.AppSettings["WebfarmServers"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < servers.Length; i++)
+            {
+                collectorFactory.CreatePerformanceCounterActors("Webfarm", servers[i].Trim(), collectorIntervalMs, _displayActor);
+            }
+
+            //collectorFactory.CreatePerformanceCounterActors("Other", "iWeb02", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "web6", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA04", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA05", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "ES-DATA06", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "Redis.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Other", "RavenDbNode04.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web8.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web9.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web10.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web11.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web12.shgdmz.dk", collectorIntervalMs, _displayActor);
+            //collectorFactory.CreatePerformanceCounterActors("Webfarm", "web13.shgdmz.dk", collectorIntervalMs, _displayActor);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
